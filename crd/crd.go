@@ -56,6 +56,10 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 											MaxLength:   intptr(16),
 											Pattern:     DBUsernamePattern,
 										},
+										"password": {
+											Type:        "object",
+											Description: "Password to access the database",
+										},
 										"dbname": {
 											Type:        "string",
 											Description: "Database name",
@@ -91,11 +95,11 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 											Type:        "boolean",
 											Description: "should it be available in multiple regions?",
 										},
-										"publiclyaccessible": {
+										"publicaccess": {
 											Type:        "boolean",
 											Description: "is the database publicly accessible?",
 										},
-										"storageencrypted": {
+										"encrypted": {
 											Type:        "boolean",
 											Description: "should the storage be encrypted?",
 										},
@@ -123,6 +127,10 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 										"tags": {
 											Type:        "string",
 											Description: "Tags to create on the database instance format key=value,key1=value1",
+										},
+										"provider": {
+											Type:        "string",
+											Description: "Provider type",
 										},
 										"skipfinalsnapshot": {
 											Type:        "boolean",
