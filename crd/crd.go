@@ -173,24 +173,25 @@ type Database struct {
 
 // DatabaseSpec main structure describing the database instance
 type DatabaseSpec struct {
-	Username              string               `json:"username"`
-	Password              v1.SecretKeySelector `json:"password"`
-	DBName                string               `json:"dbname"`
-	Engine                string               `json:"engine"`           // "postgres"
-	Version               string               `json:"version"`          // version of the engine / database
-	Class                 string               `json:"class"`            // like "db.t2.micro"
-	Size                  int64                `json:"size"`             // size in gb
-	MaxAllocatedSize      int64                `json:"MaxAllocatedSize"` // max_allocated_storage size in gb, the maximum allowed storage size for the database when using autoscaling. Has to be larger then size
-	MultiAZ               bool                 `json:"multiaz,omitempty"`
-	PubliclyAccessible    bool                 `json:"publicaccess,omitempty"`
-	StorageEncrypted      bool                 `json:"encrypted,omitempty"`
-	StorageType           string               `json:"storagetype,omitempty"`
-	Iops                  int64                `json:"iops,omitempty"`
-	BackupRetentionPeriod int64                `json:"backupretentionperiod,omitempty"` // between 0 and 35, zero means disable
-	DeleteProtection      bool                 `json:"deleteprotection,omitempty"`
-	Tags                  string               `json:"tags,omitempty"`     // key=value,key1=value1
-	Provider              string               `json:"provider,omitempty"` // local or aws
-	SkipFinalSnapshot     bool                 `json:"skipfinalsnapshot,omitempty"`
+	Username string               `json:"username"`
+	Password v1.SecretKeySelector `json:"password"`
+	DBName   string               `json:"dbname"`
+	Engine   string               `json:"engine"`  // "postgres"
+	Version  string               `json:"version"` // version of the engine / database
+	Class    string               `json:"class"`   // like "db.t2.micro"
+	Size     int64                `json:"size"`    // size in gb
+	// MaxAllocatedSize has been removed since we don't use it for CloudNatix.
+	// See https://cloudnatix.atlassian.net/browse/CNATIX-4206.
+	MultiAZ               bool   `json:"multiaz,omitempty"`
+	PubliclyAccessible    bool   `json:"publicaccess,omitempty"`
+	StorageEncrypted      bool   `json:"encrypted,omitempty"`
+	StorageType           string `json:"storagetype,omitempty"`
+	Iops                  int64  `json:"iops,omitempty"`
+	BackupRetentionPeriod int64  `json:"backupretentionperiod,omitempty"` // between 0 and 35, zero means disable
+	DeleteProtection      bool   `json:"deleteprotection,omitempty"`
+	Tags                  string `json:"tags,omitempty"`     // key=value,key1=value1
+	Provider              string `json:"provider,omitempty"` // local or aws
+	SkipFinalSnapshot     bool   `json:"skipfinalsnapshot,omitempty"`
 }
 
 type DatabaseStatus struct {
