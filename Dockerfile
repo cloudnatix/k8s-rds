@@ -7,7 +7,7 @@ COPY Makefile go.mod go.sum ./
 RUN make mod tools
 
 COPY . .
-RUN make build
+RUN make test lint build
 
 FROM alpine
 
