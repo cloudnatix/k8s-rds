@@ -267,7 +267,6 @@ func convertSpecToInput(v *crd.Database, subnetName string, securityGroups []str
 	input := &rds.CreateDBInstanceInput{
 		DBName:                aws.String(v.Spec.DBName),
 		AllocatedStorage:      aws.Int32(int32(v.Spec.Size)),
-		MaxAllocatedStorage:   aws.Int32(int32(v.Spec.MaxAllocatedSize)),
 		DBInstanceClass:       aws.String(v.Spec.Class),
 		DBInstanceIdentifier:  aws.String(dbidentifier(v)),
 		VpcSecurityGroupIds:   securityGroups,
@@ -294,7 +293,7 @@ func convertSpecToInput(v *crd.Database, subnetName string, securityGroups []str
 	return input
 }
 
-//DescribeInstancesResponse
+// DescribeInstancesResponse
 // describeNodeEC2Instance returns the AWS Metadata for the firt Node from the cluster
 func describeNodeEC2Instance(ctx context.Context, kubectl *kubernetes.Clientset, svc *ec2.Client) (*ec2.DescribeInstancesOutput, error) {
 	nodes, err := kubectl.CoreV1().Nodes().List(ctx, metav1.ListOptions{})

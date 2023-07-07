@@ -32,6 +32,10 @@ func floatptr(x float64) *float64 {
 	return &x
 }
 
+func boolptr(x bool) *bool {
+	return &x
+}
+
 func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 	return &apiextv1.CustomResourceDefinition{
 		ObjectMeta: meta_v1.ObjectMeta{Name: FullCRDName},
@@ -44,7 +48,8 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 					Storage: true,
 					Schema: &apiextv1.CustomResourceValidation{
 						OpenAPIV3Schema: &apiextv1.JSONSchemaProps{
-							Type: "object",
+							Type:              "object",
+							XEmbeddedResource: true,
 							Properties: map[string]apiextv1.JSONSchemaProps{
 								"spec": {
 									Type: "object",
@@ -57,8 +62,9 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 											Pattern:     DBUsernamePattern,
 										},
 										"password": {
-											Type:        "object",
-											Description: "Password to access the database",
+											Type:                   "object",
+											Description:            "Password to access the database",
+											XPreserveUnknownFields: boolptr(true),
 										},
 										"dbname": {
 											Type:        "string",
@@ -80,12 +86,6 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 											Description: "instance class name. Ex: db.m5.24xlarge or db.m3.medium",
 										},
 										"size": {
-											Type:        "integer",
-											Description: "Database size in Gb",
-											Minimum:     floatptr(20),
-											Maximum:     floatptr(64000),
-										},
-										"MaxAllocatedSize": {
 											Type:        "integer",
 											Description: "Database size in Gb",
 											Minimum:     floatptr(20),
