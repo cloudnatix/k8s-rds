@@ -4,7 +4,6 @@ metadata:
   name: my_db
   namespace: default
 spec:
-  maxallocatedsize: 200
   backupretentionperiod: 10
   class: db.t2.micro
   dbname: database_name

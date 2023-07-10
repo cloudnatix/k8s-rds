@@ -32,6 +32,10 @@ func floatptr(x float64) *float64 {
 	return &x
 }
 
+func boolptr(x bool) *bool {
+	return &x
+}
+
 func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 	return &apiextv1.CustomResourceDefinition{
 		ObjectMeta: meta_v1.ObjectMeta{Name: FullCRDName},
@@ -44,7 +48,8 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 					Storage: true,
 					Schema: &apiextv1.CustomResourceValidation{
 						OpenAPIV3Schema: &apiextv1.JSONSchemaProps{
-							Type: "object",
+							Type:              "object",
+							XEmbeddedResource: true,
 							Properties: map[string]apiextv1.JSONSchemaProps{
 								"spec": {
 									Type: "object",
@@ -55,6 +60,11 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 											MinLength:   intptr(1),
 											MaxLength:   intptr(16),
 											Pattern:     DBUsernamePattern,
+										},
+										"password": {
+											Type:                   "object",
+											Description:            "Password to access the database",
+											XPreserveUnknownFields: boolptr(true),
 										},
 										"dbname": {
 											Type:        "string",
@@ -81,21 +91,15 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 											Minimum:     floatptr(20),
 											Maximum:     floatptr(64000),
 										},
-										"MaxAllocatedSize": {
-											Type:        "integer",
-											Description: "Database size in Gb",
-											Minimum:     floatptr(20),
-											Maximum:     floatptr(64000),
-										},
 										"multiaz": {
 											Type:        "boolean",
 											Description: "should it be available in multiple regions?",
 										},
-										"publiclyaccessible": {
+										"publicaccess": {
 											Type:        "boolean",
 											Description: "is the database publicly accessible?",
 										},
-										"storageencrypted": {
+										"encrypted": {
 											Type:        "boolean",
 											Description: "should the storage be encrypted?",
 										},
@@ -123,6 +127,10 @@ func NewDatabaseCRD() *apiextv1.CustomResourceDefinition {
 										"tags": {
 											Type:        "string",
 											Description: "Tags to create on the database instance format key=value,key1=value1",
+										},
+										"provider": {
+											Type:        "string",
+											Description: "Provider type",
 										},
 										"skipfinalsnapshot": {
 											Type:        "boolean",
@@ -165,24 +173,25 @@ type Database struct {
 
 // DatabaseSpec main structure describing the database instance
 type DatabaseSpec struct {
-	Username              string               `json:"username"`
-	Password              v1.SecretKeySelector `json:"password"`
-	DBName                string               `json:"dbname"`
-	Engine                string               `json:"engine"`           // "postgres"
-	Version               string               `json:"version"`          // version of the engine / database
-	Class                 string               `json:"class"`            // like "db.t2.micro"
-	Size                  int64                `json:"size"`             // size in gb
-	MaxAllocatedSize      int64                `json:"MaxAllocatedSize"` // max_allocated_storage size in gb, the maximum allowed storage size for the database when using autoscaling. Has to be larger then size
-	MultiAZ               bool                 `json:"multiaz,omitempty"`
-	PubliclyAccessible    bool                 `json:"publicaccess,omitempty"`
-	StorageEncrypted      bool                 `json:"encrypted,omitempty"`
-	StorageType           string               `json:"storagetype,omitempty"`
-	Iops                  int64                `json:"iops,omitempty"`
-	BackupRetentionPeriod int64                `json:"backupretentionperiod,omitempty"` // between 0 and 35, zero means disable
-	DeleteProtection      bool                 `json:"deleteprotection,omitempty"`
-	Tags                  string               `json:"tags,omitempty"`     // key=value,key1=value1
-	Provider              string               `json:"provider,omitempty"` // local or aws
-	SkipFinalSnapshot     bool                 `json:"skipfinalsnapshot,omitempty"`
+	Username string               `json:"username"`
+	Password v1.SecretKeySelector `json:"password"`
+	DBName   string               `json:"dbname"`
+	Engine   string               `json:"engine"`  // "postgres"
+	Version  string               `json:"version"` // version of the engine / database
+	Class    string               `json:"class"`   // like "db.t2.micro"
+	Size     int64                `json:"size"`    // size in gb
+	// MaxAllocatedSize has been removed since we don't use it for CloudNatix.
+	// See https://cloudnatix.atlassian.net/browse/CNATIX-4206.
+	MultiAZ               bool   `json:"multiaz,omitempty"`
+	PubliclyAccessible    bool   `json:"publicaccess,omitempty"`
+	StorageEncrypted      bool   `json:"encrypted,omitempty"`
+	StorageType           string `json:"storagetype,omitempty"`
+	Iops                  int64  `json:"iops,omitempty"`
+	BackupRetentionPeriod int64  `json:"backupretentionperiod,omitempty"` // between 0 and 35, zero means disable
+	DeleteProtection      bool   `json:"deleteprotection,omitempty"`
+	Tags                  string `json:"tags,omitempty"`     // key=value,key1=value1
+	Provider              string `json:"provider,omitempty"` // local or aws
+	SkipFinalSnapshot     bool   `json:"skipfinalsnapshot,omitempty"`
 }
 
 type DatabaseStatus struct {

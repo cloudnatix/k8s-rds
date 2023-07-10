@@ -2,7 +2,6 @@ package crd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"testing"
 
 	"github.com/ghodss/yaml"
@@ -23,7 +22,6 @@ func TestMarshal(t *testing.T) {
 			Password:           v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible: false,
 			Size:               20,
-			MaxAllocatedSize:   20,
 			StorageEncrypted:   true,
 			StorageType:        "gp2",
 			Username:           "dbuser",
@@ -50,7 +48,6 @@ func TestCRDValidationWithValidInput(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  50,
-			MaxAllocatedSize:      50,
 			StorageEncrypted:      true,
 			StorageType:           "gp2",
 			Username:              "dbuser",
@@ -60,22 +57,6 @@ func TestCRDValidationWithValidInput(t *testing.T) {
 
 	loader := gojsonschema.NewGoLoader(NewDatabaseCRD().Spec.Versions[0].Schema.OpenAPIV3Schema)
 	documentLoader := gojsonschema.NewGoLoader(d)
-
-	result, err := gojsonschema.Validate(loader, documentLoader)
-	assert.NoError(t, err)
-	assert.True(t, result.Valid(), result.Errors())
-}
-
-func TestCaseInsensitiveInput(t *testing.T) {
-	// in the test.yaml, you can see maxallocatedsize instead of MaxAllocatedSize
-	yamlFile, err := ioutil.ReadFile("test.yaml")
-	assert.NoError(t, err)
-	db := Database{}
-	err = yaml.Unmarshal(yamlFile, &db)
-	assert.NoError(t, err)
-	assert.Equal(t, int(db.Spec.MaxAllocatedSize), 200, "they should be equal")
-	loader := gojsonschema.NewGoLoader(NewDatabaseCRD().Spec.Versions[0].Schema.OpenAPIV3Schema)
-	documentLoader := gojsonschema.NewGoLoader(db)
 
 	result, err := gojsonschema.Validate(loader, documentLoader)
 	assert.NoError(t, err)
@@ -96,7 +77,6 @@ func TestDatabaseSizeIsTooSmall(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  10,
-			MaxAllocatedSize:      10,
 			StorageEncrypted:      true,
 			StorageType:           "gp2",
 			Username:              "dbuser",
@@ -125,7 +105,6 @@ func TestDatabaseSizeIsTooBig(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65000,
-			MaxAllocatedSize:      65000,
 			StorageEncrypted:      true,
 			StorageType:           "gp2",
 			Username:              "dbuser",
@@ -154,7 +133,6 @@ func TestBackupRetentionPeriodIsTooLong(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65,
-			MaxAllocatedSize:      65,
 			StorageEncrypted:      true,
 			StorageType:           "gp2",
 			Username:              "dbuser",
@@ -183,7 +161,6 @@ func TestInvalidDatabaseNameWithDashSeparator(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65,
-			MaxAllocatedSize:      65,
 			StorageEncrypted:      true,
 			StorageType:           "gp2",
 			Username:              "dbuser",
@@ -212,7 +189,6 @@ func TestInvalidDatabaseNameStartingWithANumber(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65,
-			MaxAllocatedSize:      65,
 			StorageEncrypted:      true,
 			StorageType:           "gp2",
 			Username:              "dbuser",
@@ -241,7 +217,6 @@ func TestInvalidUsername(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65,
-			MaxAllocatedSize:      65,
 			StorageEncrypted:      true,
 			StorageType:           "gp2",
 			Username:              "db-user",
@@ -270,7 +245,6 @@ func TestInvalidStorageType(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65,
-			MaxAllocatedSize:      65,
 			StorageEncrypted:      true,
 			StorageType:           "io2",
 			Username:              "dbuser",
@@ -299,7 +273,6 @@ func TestIopsTooSmall(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65,
-			MaxAllocatedSize:      65,
 			StorageEncrypted:      true,
 			StorageType:           "io1",
 			Username:              "dbuser",
@@ -328,7 +301,6 @@ func TestIopsTooBig(t *testing.T) {
 			Password:              v1.SecretKeySelector{Key: "key", LocalObjectReference: v1.LocalObjectReference{Name: "DB-Secret"}},
 			PubliclyAccessible:    false,
 			Size:                  65,
-			MaxAllocatedSize:      65,
 			StorageEncrypted:      true,
 			StorageType:           "io1",
 			Username:              "dbuser",

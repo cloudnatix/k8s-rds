@@ -18,7 +18,6 @@ func TestConvertSpecToInput(t *testing.T) {
 			Username:           "myuser",
 			Class:              "db.t2.micro",
 			Size:               100,
-			MaxAllocatedSize:   200,
 			MultiAZ:            true,
 			PubliclyAccessible: true,
 			StorageEncrypted:   true,
@@ -35,7 +34,6 @@ func TestConvertSpecToInput(t *testing.T) {
 	assert.Equal(t, "myuser", *i.MasterUsername)
 	assert.Equal(t, "db.t2.micro", *i.DBInstanceClass)
 	assert.Equal(t, int32(100), *i.AllocatedStorage)
-	assert.Equal(t, int32(200), *i.MaxAllocatedStorage)
 	assert.Equal(t, true, *i.PubliclyAccessible)
 	assert.Equal(t, true, *i.MultiAZ)
 	assert.Equal(t, true, *i.StorageEncrypted)
